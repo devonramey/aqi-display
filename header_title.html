@@ -31,11 +31,11 @@
       font-family: Arial, sans-serif;
       font-weight: bold;
       font-size: 42px;
-      color: #00faff;
+      color: #5CF2FF; /* Updated text color */
       white-space: nowrap;
       animation:
         slideIn 1s ease-out forwards,
-        glowPulse 2s infinite 1s; /* Glow starts after slide-in finishes */
+        glowPulse 2s infinite 1s;
       opacity: 0;
     }
 
@@ -53,17 +53,17 @@
     @keyframes glowPulse {
       0%, 100% {
         text-shadow:
-          0 0 5px #00faff,
-          0 0 10px #00faff,
-          0 0 20px #00faff,
-          0 0 40px #00ffff;
+          0 0 2px #5CF2FF,
+          0 0 4px #5CF2FF,
+          0 0 6px #5CF2FF,
+          0 0 8px #5CF2FF;
       }
       50% {
         text-shadow:
-          0 0 2px #00faff,
-          0 0 6px #00faff,
-          0 0 12px #00faff,
-          0 0 24px #00ffff;
+          0 0 1px #5CF2FF,
+          0 0 2px #5CF2FF,
+          0 0 3px #5CF2FF,
+          0 0 4px #5CF2FF;
       }
     }
   </style>
@@ -74,6 +74,7 @@
   </div>
 </body>
 </html>
+
 
 
 
