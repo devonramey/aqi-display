@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Satellites Overhead</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css">
+  <script src="https://js.arcgis.com/4.29/"></script>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #222;
+      font-family: Arial, sans-serif;
+      color: white;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .radar-background {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,255,255,0.3) 10%, transparent 60%);
+      animation: pulse 2s infinite;
+      z-index: 0;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    h2 {
+      font-size: 2rem;
+      background: linear-gradient(to right, #5CF2FF, #00faff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: bold;
+      margin-bottom: 1rem;
+    }
+
+    .stat-box {
+      display: inline-block;
+      margin: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+
+    .leo { background: green; color: white; }
+    .meo { background: gold; color: black; }
+    .geo { background: orange; color: white; }
+    .heo { background: red; color: white; }
+
+    .timestamp {
+      font-style: italic;
+      margin-top: 1rem;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="radar-background"></div>
+  <div class="content">
+    <h2>Satellites Overhead</h2>
+    <div id="sat-info">Loading satellite data...</div>
+  </div>
+
+  <script>
+    require(["esri/request"], function(esriRequest) {
+      const url = "https://services5.arcgis.com/t2t1phUp5Bj3z8Lp/arcgis/rest/services/Satellite_Point/FeatureServer/0/query";
+
+      esriRequest(url, {
+        query: {
+          where: "1=1",
+          outFields: "altitude_km,last_update",
+          returnGeometry: false,
+          f: "json"
+        },
+        responseType: "json"
+      }).then(response => {
+        const features = response.data.features;
+        let count_LEO = 0, count_MEO = 0, count_GEO = 0, count_HEO = 0;
+        let latestUpdate = null;
+
+        const leo_max = 2000;
+        const meo_max = 35786;
+        const geo_exact = 35786;
+
+        features.forEach(f => {
+          const alt = f.attributes.altitude_km;
+          const ts = f.attributes.last_update;
+
+          if (alt != null) {
+            if (alt < leo_max) count_LEO++;
+            else if (alt < meo_max) count_MEO++;
+            else if (Math.round(alt) === geo_exact) count_GEO++;
+            else if (alt > geo_exact) count_HEO++;
+          }
+
+          if (ts && (!latestUpdate || ts > latestUpdate)) {
+            latestUpdate = ts;
+          }
+        });
+
+        const total = count_LEO + count_MEO + count_GEO + count_HEO;
+
+        const html = `
+          <p>Currently tracking <span style="text-decoration:underline;">${total}</span> satellites above.</p>
+          <div class="stat-box leo">LEO: ${count_LEO}</div>
+          <div class="stat-box meo">MEO: ${count_MEO}</div>
+          <div class="stat-box geo">GEO: ${count_GEO}</div>
+          <div class="stat-box heo">HEO: ${count_HEO}</div>
+          <div class="timestamp">Last Updated: ${latestUpdate || 'N/A'}</div>
+        `;
+
+        document.getElementById("sat-info").innerHTML = html;
+      }).catch(err => {
+        console.error("Failed to load data:", err);
+        document.getElementById("sat-info").textContent = "Failed to load satellite data.";
+      });
+    });
+  </script>
+</body>
+</html>
