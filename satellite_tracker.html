@@ -86,18 +86,35 @@
   <script>
     require(["esri/request"], function(esriRequest) {
       const url = "https://services5.arcgis.com/t2t1phUp5Bj3z8Lp/arcgis/rest/services/Satellite_Point/FeatureServer/0/query";
+      const allFeatures = [];
+      const batchSize = 1000;
+      let offset = 0;
 
-      esriRequest(url, {
-        query: {
-          where: "1=1",
-          outFields: "altitude_km,last_update",
-          returnGeometry: false,
-          f: "json",
-          resultRecordCount: 10000
-        },
-        responseType: "json"
-      }).then(response => {
-        const features = response.data.features;
+      function fetchBatch() {
+        return esriRequest(url, {
+          query: {
+            where: "1=1",
+            outFields: "altitude_km,last_update",
+            returnGeometry: false,
+            f: "json",
+            resultOffset: offset,
+            resultRecordCount: batchSize
+          },
+          responseType: "json"
+        }).then(response => {
+          const features = response.data.features;
+          allFeatures.push(...features);
+
+          if (features.length === batchSize) {
+            offset += batchSize;
+            return fetchBatch();
+          } else {
+            return allFeatures;
+          }
+        });
+      }
+
+      fetchBatch().then(features => {
         let count_LEO = 0, count_MEO = 0, count_GEO = 0, count_HEO = 0;
         let latestUpdate = null;
 
