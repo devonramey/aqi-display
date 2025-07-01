@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Header Title</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      width: 100%;
+      height: 100%;
+    }
+
+    .header-title {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      font-size: 36px;
+      color: #00faff;
+      text-align: center;
+      text-shadow:
+        0 0 5px #00faff,
+        0 0 10px #00faff,
+        0 0 20px #00faff,
+        0 0 40px #00ffff;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        text-shadow:
+          0 0 5px #00faff,
+          0 0 10px #00faff,
+          0 0 20px #00faff,
+          0 0 40px #00ffff;
+      }
+      50% {
+        text-shadow:
+          0 0 2px #00faff,
+          0 0 6px #00faff,
+          0 0 12px #00faff,
+          0 0 24px #00ffff;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header-title">ARKANSAS THREAT INTELLIGENCE PORTAL</div>
+</body>
+</html>
+
