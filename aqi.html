@@ -1,164 +1,94 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Little Rock Air Quality</title>
-  <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css" />
-  <script src="https://js.arcgis.com/4.29/"></script>
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f5f7fa;
-      margin: 0;
-      padding: 2rem;
-      display: flex;
-      justify-content: center;
-    }
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #444444;
+    font-family: 'Segoe UI', sans-serif;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    color: white;
+  }
 
+  .aq-card {
+    background: #555555;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    width: 100%;
+    box-sizing: border-box;
+    max-width: 450px;
+    margin: 0 auto;
+    color: white;
+  }
+
+  h2 {
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 1.4rem;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0.6rem 0.4rem;
+    border-bottom: 1px solid #666;
+  }
+
+  th {
+    font-weight: 600;
+    color: #dddddd;
+  }
+
+  td {
+    color: #ffffff;
+  }
+
+  .aqi-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    min-width: 50px;
+    color: white;
+    font-size: 0.9rem;
+  }
+
+  .green { background: #4caf50; }
+  .yellow { background: #ffeb3b; color: black; }
+  .orange { background: #ff9800; }
+  .red { background: #f44336; }
+  .purple { background: #9c27b0; }
+  .maroon { background: #800000; }
+  .gray { background: #aaa; color: black; }
+
+  .loading {
+    text-align: center;
+    font-style: italic;
+    color: #cccccc;
+  }
+
+  @media (max-width: 400px) {
     .aq-card {
-      background: white;
-      padding: 1.5rem 2rem;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      width: 100%;
-      max-width: 400px;
-    }
-
-    h2 {
-      color: #2b6cb0;
-      text-align: center;
-      margin-bottom: 1.5rem;
+      padding: 1rem;
+      font-size: 0.9rem;
     }
 
     table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th {
-      text-align: left;
-      font-weight: 600;
-      padding-bottom: 0.5rem;
-    }
-
-    td {
-      padding: 0.4rem 0;
-      font-size: 15px;
+      font-size: 0.85rem;
     }
 
     .aqi-badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 5px;
-      font-weight: bold;
-      text-align: center;
-      min-width: 50px;
-      color: white;
+      min-width: 40px;
     }
+  }
+</style>
 
-    .green { background: #4caf50; }
-    .yellow { background: #ffeb3b; color: black; }
-    .orange { background: #ff9800; }
-    .red { background: #f44336; }
-    .purple { background: #9c27b0; }
-    .maroon { background: #800000; }
-    .gray { background: #ccc; color: black; }
-
-    .loading {
-      text-align: center;
-      font-style: italic;
-      color: #888;
-    }
-  </style>
-</head>
-<body>
-  <div class="aq-card">
-    <h2>Little Rock Air Quality</h2>
-    <div id="aq-content" class="loading">Loading data...</div>
-  </div>
-
-  <script>
-    require(["esri/request"], function(esriRequest) {
-      const aqsid = "051190007";
-      const url = "https://services.arcgis.com/cJ9YHowT8TU7DUyn/arcgis/rest/services/Air%20Now%20Current%20Monitor%20Data%20Public/FeatureServer/0/query";
-
-      esriRequest(url, {
-        query: {
-          where: `AQSID = '${aqsid}'`,
-          outFields: "OZONE_AQI,PM25_AQI,PM10_AQI,OZONE,PM25,PM10,AQSID",
-          returnGeometry: false,
-          f: "json"
-        },
-        responseType: "json"
-      }).then(response => {
-        const features = response.data.features;
-        if (!features.length) {
-          document.getElementById("aq-content").innerHTML = "<p>No sensor data available.</p>";
-          return;
-        }
-
-        const f = features[0].attributes;
-
-        function getColor(aqi) {
-          if (aqi == null) return "gray";
-          if (aqi <= 50) return "green";
-          else if (aqi <= 100) return "yellow";
-          else if (aqi <= 150) return "orange";
-          else if (aqi <= 200) return "red";
-          else if (aqi <= 300) return "purple";
-          else return "maroon";
-        }
-
-        function formatVal(val, unit) {
-          return val == null ? "N/A" : `${val.toFixed(1)} ${unit}`;
-        }
-
-        function formatAQI(val) {
-          return val == null ? "N/A" : Math.round(val);
-        }
-
-        function colorBadge(val) {
-          const color = getColor(val);
-          const className = `aqi-badge ${color}`;
-          return `<span class="${className}">${formatAQI(val)}</span>`;
-        }
-
-        const html = `
-          <table>
-            <thead>
-              <tr>
-                <th>Pollutant</th>
-                <th>AQI</th>
-                <th>Concentration</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Ozone</td>
-                <td>${colorBadge(f.OZONE_AQI)}</td>
-                <td>${formatVal(f.OZONE, "ppb")}</td>
-              </tr>
-              <tr>
-                <td>PM2.5</td>
-                <td>${colorBadge(f.PM25_AQI)}</td>
-                <td>${formatVal(f.PM25, "µg/m³")}</td>
-              </tr>
-              <tr>
-                <td>PM10</td>
-                <td>${colorBadge(f.PM10_AQI)}</td>
-                <td>${formatVal(f.PM10, "µg/m³")}</td>
-              </tr>
-            </tbody>
-          </table>
-        `;
-
-        document.getElementById("aq-content").innerHTML = html;
-      }).catch(err => {
-        console.error("Error fetching data:", err);
-        document.getElementById("aq-content").innerHTML = "<p>Error loading data.</p>";
-      });
-    });
-  </script>
-</body>
-</html>
 
