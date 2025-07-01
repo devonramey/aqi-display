@@ -50,12 +50,18 @@
       margin-bottom: 1rem;
     }
 
+    .stats-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
     .stat-box {
-      display: inline-block;
       margin: 0.5rem;
       padding: 0.5rem 1rem;
       border-radius: 8px;
       font-weight: bold;
+      width: fit-content;
     }
 
     .leo { background: green; color: white; }
@@ -86,7 +92,8 @@
           where: "1=1",
           outFields: "altitude_km,last_update",
           returnGeometry: false,
-          f: "json"
+          f: "json",
+          resultRecordCount: 10000
         },
         responseType: "json"
       }).then(response => {
@@ -118,10 +125,12 @@
 
         const html = `
           <p>Currently tracking <span style="text-decoration:underline;">${total}</span> satellites above.</p>
-          <div class="stat-box leo">LEO: ${count_LEO}</div>
-          <div class="stat-box meo">MEO: ${count_MEO}</div>
-          <div class="stat-box geo">GEO: ${count_GEO}</div>
-          <div class="stat-box heo">HEO: ${count_HEO}</div>
+          <div class="stats-container">
+            <div class="stat-box leo">Low Earth Orbit (LEO): ${count_LEO}</div>
+            <div class="stat-box meo">Medium Earth Orbit (MEO): ${count_MEO}</div>
+            <div class="stat-box geo">Geostationary Orbit (GEO): ${count_GEO}</div>
+            <div class="stat-box heo">High Earth Orbit (HEO): ${count_HEO}</div>
+          </div>
           <div class="timestamp">Last Updated: ${latestUpdate || 'N/A'}</div>
         `;
 
