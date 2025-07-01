@@ -80,19 +80,12 @@
   <script>
     require(["esri/request"], function(esriRequest) {
       const aqsid = "051190007";
-      const itemId = "2d718d2733a74d1689d72b922c0ac4f4";
-      const layerIndex = 0;
-      const fields = [
-        "OZONE_AQI", "PM25_AQI", "PM10_AQI",
-        "OZONE", "PM25", "PM10", "AQSID"
-      ];
-
-      const url = `https://services.arcgis.com/V6ZHFr6zdgNZuVG0/arcgis/rest/services/${itemId}/FeatureServer/${layerIndex}/query`;
+      const url = "https://services.arcgis.com/cJ9YHowT8TU7DUyn/arcgis/rest/services/Air%20Now%20Current%20Monitor%20Data%20Public/FeatureServer/0/query";
 
       esriRequest(url, {
         query: {
           where: `AQSID = '${aqsid}'`,
-          outFields: fields.join(","),
+          outFields: "OZONE_AQI,PM25_AQI,PM10_AQI,OZONE,PM25,PM10,AQSID",
           returnGeometry: false,
           f: "json"
         },
@@ -168,3 +161,4 @@
   </script>
 </body>
 </html>
+
