@@ -2,37 +2,62 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Resizable N2YO Widget</title>
+  <title>Responsive N2YO Widget</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #widget-wrapper {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    .n2yo-widget {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  </style>
 </head>
 <body>
-  <div id="widget-wrapper">
-    <script>
-      // Dynamically resize based on window size
-      function embedWidget() {
-        let width = window.innerWidth;
-        let height = window.innerHeight;
+  <div id="widget-wrapper"></div>
 
-        // Clear existing widget if any
-        document.getElementById('widget-wrapper').innerHTML = '';
+  <script>
+    function embedWidget() {
+      document.getElementById('widget-wrapper').innerHTML = '';
 
-        // Inject N2YO widget script
-        let script1 = document.createElement('script');
-        script1.innerHTML = `
-          var norad_n2yo = '25544';
-          var size_n2yo = 'small';
-          var allpasses_n2yo = 1;
-          var map_n2yo = 4;
-        `;
-        document.getElementById('widget-wrapper').appendChild(script1);
+      const script1 = document.createElement('script');
+      script1.innerHTML = `
+        var norad_n2yo = '25544';
+        var size_n2yo = 'small';
+        var allpasses_n2yo = 1;
+        var map_n2yo = 4;
+      `;
+      document.getElementById('widget-wrapper').appendChild(script1);
 
-        let script2 = document.createElement('script');
-        script2.src = 'https://www.n2yo.com/js/widget-tracker.js';
-        document.getElementById('widget-wrapper').appendChild(script2);
-      }
+      const script2 = document.createElement('script');
+      script2.src = 'https://www.n2yo.com/js/widget-tracker.js';
+      document.getElementById('widget-wrapper').appendChild(script2);
 
-      window.onload = embedWidget;
-      window.onresize = embedWidget;
-    </script>
-  </div>
+      // Wait for DOM to be updated, then override styles
+      setTimeout(() => {
+        const widget = document.querySelector('.n2yo-widget');
+        if (widget) {
+          widget.style.width = '100%';
+          widget.style.height = '100%';
+        }
+      }, 1000); // wait for widget to load
+    }
+
+    window.onload = embedWidget;
+    window.onresize = () => {
+      // Optionally re-render on resize
+      embedWidget();
+    };
+  </script>
 </body>
 </html>
+
