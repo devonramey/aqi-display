@@ -2,15 +2,36 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>ISS Tracker</title>
+  <title>Responsive ISS Tracker</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+    #widget-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+  </style>
 </head>
 <body>
-  <script>
-    var norad_n2yo = '25544';
-    var size_n2yo = 'small';
-    var allpasses_n2yo = '1';
-    var map_n2yo = '4';
-  </script>
-  <script src="https://www.n2yo.com/js/widget-tracker.js"></script>
+  <div id="widget-container">
+    <script>
+      var norad_n2yo = '25544'; // ISS
+      var size_n2yo = 'small'; // 'small', 'medium', 'large'
+      var allpasses_n2yo = '1';
+      var map_n2yo = '4';
+    </script>
+    <script src="https://www.n2yo.com/js/widget-tracker.js"></script>
+  </div>
 </body>
 </html>
