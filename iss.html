@@ -2,38 +2,83 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Responsive N2YO Widget</title>
+  <title>ISS Visual Passes</title>
   <style>
-    html, body {
+    body {
+      font-family: Arial, sans-serif;
+      padding: 10px;
       margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
+      background-color: #0b1e39;
+      color: #ffffff;
     }
-
-    #widget-container {
-      width: 100%;
-      height: 100%;
-      position: relative;
+    h2 {
+      text-align: center;
     }
-
-    .n2yo-widget {
-      width: 100% !important;
-      height: 100% !important;
+    .pass {
+      border: 1px solid #3a4f6d;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 6px;
+      background-color: #1c2e4a;
+    }
+    .label {
+      font-weight: bold;
+      color: #88c1ff;
     }
   </style>
 </head>
 <body>
-  <div id="widget-container">
-    <script>
-      var norad_n2yo = '25544';      // ISS
-      var size_n2yo = 'medium';      // Options: small, medium, large
-      var allpasses_n2yo = 1;        // Show all passes
-      var map_n2yo = 4;              // Map style
-    </script>
-    <script src="https://www.n2yo.com/js/widget-tracker.js"></script>
-  </div>
+  <h2>Upcoming Visible ISS Passes</h2>
+  <div id="passes">Loading...</div>
+
+  <script>
+    const apiKey = "2XL495-RPWALE-WFNKZT-5ILK";
+    const satId = 25544; // ISS
+    const observerLat = 34.7465; // Little Rock
+    const observerLng = -92.2896;
+    const observerAlt = 100; // in meters
+    const days = 3;
+    const minVisibility = 120;
+
+    const apiUrl = `https://api.n2yo.com/rest/v1/satellite/visualpasses/${satId}/${observerLat}/${observerLng}/${observerAlt}/${days}/${minVisibility}?apiKey=${apiKey}`;
+
+    fetch(apiUrl)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error("HTTP status " + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        const container = document.getElementById("passes");
+        container.innerHTML = "";
+
+        if (!data.passes || data.passes.length === 0) {
+          container.innerHTML = "No visible passes found.";
+          return;
+        }
+
+        data.passes.forEach(pass => {
+          const start = new Date(pass.startUTC * 1000);
+          const max = new Date(pass.maxUTC * 1000);
+          const end = new Date(pass.endUTC * 1000);
+
+          const html = `
+            <div class="pass">
+              <div><span class="label">Start:</span> ${start.toLocaleString()} (${pass.startAzCompass}, Elev: ${pass.startEl.toFixed(1)}°)</div>
+              <div><span class="label">Max Elevation:</span> ${max.toLocaleString()} (${pass.maxAzCompass}, Elev: ${pass.maxEl.toFixed(1)}°)</div>
+              <div><span class="label">End:</span> ${end.toLocaleString()} (${pass.endAzCompass}, Elev: ${pass.endEl.toFixed(1)}°)</div>
+              <div><span class="label">Duration:</span> ${pass.duration} sec</div>
+              <div><span class="label">Brightness:</span> mag ${pass.mag}</div>
+            </div>
+          `;
+          container.innerHTML += html;
+        });
+      })
+      .catch(error => {
+        document.getElementById("passes").innerHTML = "Error retrieving pass data.";
+        console.error("API Error:", error);
+      });
+  </script>
 </body>
 </html>
-
