@@ -2,36 +2,49 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Responsive ISS Tracker</title>
+  <title>Resizable N2YO Widget</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
-      height: 100%;
       width: 100%;
-      overflow: hidden;
+      height: 100%;
     }
-    #widget-container {
+    #widget-wrapper {
       width: 100%;
       height: 100%;
-      position: relative;
-    }
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
     }
   </style>
 </head>
 <body>
-  <div id="widget-container">
+  <div id="widget-wrapper">
     <script>
-      var norad_n2yo = '25544'; // ISS
-      var size_n2yo = 'small'; // 'small', 'medium', 'large'
-      var allpasses_n2yo = '1';
-      var map_n2yo = '4';
+      // Dynamically resize based on window size
+      function embedWidget() {
+        let width = window.innerWidth;
+        let height = window.innerHeight;
+
+        // Clear existing widget if any
+        document.getElementById('widget-wrapper').innerHTML = '';
+
+        // Inject N2YO widget script
+        let script1 = document.createElement('script');
+        script1.innerHTML = `
+          var norad_n2yo = '25544';
+          var size_n2yo = 'small';
+          var allpasses_n2yo = 1;
+          var map_n2yo = 4;
+        `;
+        document.getElementById('widget-wrapper').appendChild(script1);
+
+        let script2 = document.createElement('script');
+        script2.src = 'https://www.n2yo.com/js/widget-tracker.js';
+        document.getElementById('widget-wrapper').appendChild(script2);
+      }
+
+      window.onload = embedWidget;
+      window.onresize = embedWidget;
     </script>
-    <script src="https://www.n2yo.com/js/widget-tracker.js"></script>
   </div>
 </body>
 </html>
